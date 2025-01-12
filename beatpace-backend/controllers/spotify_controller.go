@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"net/http"
-
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/yimango/beatpace-backend/services"
 )
@@ -23,6 +23,8 @@ func GeneratePlaylist(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request format"})
 		return
 	}
+
+	fmt.Println("Received request with data:", request)
 
 	// Exchange the authorization code for an access token
 	response, err := services.GetSpotifyAccessToken(request.AuthCode)

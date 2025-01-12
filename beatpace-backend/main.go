@@ -3,19 +3,10 @@ package main
 import (
 	"fmt"
 	"log"
-	"github.com/joho/godotenv"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-contrib/cors"
 	"github.com/yimango/beatpace-backend/controllers"
 )
-
-func init() {
-	// Load .env file
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-}
 
 func main() {
 	// Create a Gin router

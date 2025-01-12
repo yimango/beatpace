@@ -8,10 +8,10 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface PaceFormProps {
-  accessToken: string
+  authCode: string
 }
 
-const PaceForm: React.FC<PaceFormProps> = ({ accessToken }) => {
+const PaceForm: React.FC<PaceFormProps> = ({ authCode }) => {
   const [paceUnit, setPaceUnit] = useState<'km' | 'mile'>('km')
   const [minutes, setMinutes] = useState('')
   const [seconds, setSeconds] = useState('')
@@ -25,11 +25,11 @@ const PaceForm: React.FC<PaceFormProps> = ({ accessToken }) => {
     const paceInSeconds = parseInt(minutes) * 60 + parseInt(seconds)
   
     const data = {
-      accessToken,
+      authCode,
       paceUnit,
       paceInSeconds,
       gender,
-      height: parseFloat(height),
+      height: parseInt(height),
       heightUnit,
     }
   
@@ -39,9 +39,6 @@ const PaceForm: React.FC<PaceFormProps> = ({ accessToken }) => {
   
       const response = await fetch(`${backendUrl}/api/generate-playlist`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(data),
       })
   
