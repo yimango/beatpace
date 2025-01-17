@@ -9,7 +9,7 @@ export async function POST() {
       throw new Error('Missing Spotify credentials')
     }
 
-    const scope = 'user-read-private user-read-email playlist-modify-public playlist-modify-private'
+    const scope = 'playlist-modify-public playlist-modify-private'
 
     const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scope)}`
 

@@ -20,7 +20,7 @@ export default function SpotifyLogin() {
     loadEnvFile()
     const clientId = process.env.NEXT_PUBLIC_CLIENT_ID
     const redirectUri = process.env.NEXT_PUBLIC_REDIRECT_URI
-    const scope = 'user-read-private user-read-email playlist-modify-private'
+    const scope = 'playlist-modify-public playlist-modify-private'
     const spotifyAuthUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&scope=${encodeURIComponent(scope)}&response_type=code&redirect_uri=${encodeURIComponent(redirectUri ? redirectUri : "")}&show_dialog=true`
     window.location.href = spotifyAuthUrl
   }
