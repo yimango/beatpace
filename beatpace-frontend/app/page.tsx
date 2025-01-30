@@ -31,7 +31,8 @@ export default function Home() {
           <CardDescription>Get the perfect playlist for your running pace</CardDescription>
         </CardHeader>
         <CardContent>
-          <LoginButton />
+          {/* Only render LoginButton if authCode is not set */}
+          {!authCode && <LoginButton />}
           {/* Only render PaceForm once authCode is set */}
           {authCode && <PaceForm authCode={authCode} />}
         </CardContent>

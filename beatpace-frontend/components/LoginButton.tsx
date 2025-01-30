@@ -17,14 +17,6 @@ export default function LoginButton() {
   const handleLogin = async () => {
     setIsLoading(true)
     try {
-      // const response = await fetch('https://accounts.spotify.com/authorize', { method: 'GET' });
-      // if (!response.ok) {
-      //   throw new Error(`HTTP error! status: ${response.status}`);
-      // }
-      // const data = await response.json();
-      // if (data.error) {
-      //   throw new Error(data.error);
-      // }
       const clientId = process.env.NEXT_PUBLIC_CLIENT_ID
       const redirectUri = process.env.NEXT_PUBLIC_REDIRECT_URI
       const scope = 'playlist-modify-public playlist-modify-private'
