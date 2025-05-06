@@ -21,7 +21,8 @@ func main() {
 	}))
 
 	// Set up your routes
-	router.POST("/api/generate-playlist", controllers.GeneratePlaylist)
+	//router.POST("/api/generate-playlist", controllers.GeneratePlaylist)
+	router.POST("/api/callback", controllers.Callback)
 
 	// Start the server
 	fmt.Println("Server is running on http://localhost:3001")

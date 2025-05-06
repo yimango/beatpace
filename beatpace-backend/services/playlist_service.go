@@ -37,8 +37,8 @@ func CreatePlaylist(accessToken, paceUnit string, paceInSeconds int, gender stri
 	}
 
 	// Calculate the desired BPM based on pace and height
-	pacePerKm := float64(paceInSeconds) / 60.0
-	bpm := int(180.0 / pacePerKm)
+	//pacePerKm := float64(paceInSeconds) / 60.0
+	//bpm := int(180.0 / pacePerKm)
 
 	// Call Spotify API to create a playlist
 	playlistID, err := createSpotifyPlaylist(accessToken)
@@ -47,7 +47,7 @@ func CreatePlaylist(accessToken, paceUnit string, paceInSeconds int, gender stri
 	}
 
 	// Get a seed song
-	seed_song, err:= get_song(accessToken, "pop", bpm)
+	//seed_song, err:= get_song(accessToken, "pop", bpm)
 
 	// Return the Spotify playlist link
 	return fmt.Sprintf("https://open.spotify.com/playlist/%s", playlistID), nil

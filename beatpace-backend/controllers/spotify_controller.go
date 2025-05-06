@@ -10,6 +10,7 @@ import (
 // GeneratePlaylist handles the playlist generation request
 func GeneratePlaylist(c *gin.Context) {
 	var request struct {
+		UserID	      string  `json:"userId"`
 		AuthCode      string  `json:"authCode"`
 		PaceUnit      string  `json:"paceUnit"`
 		PaceInSeconds int     `json:"paceInSeconds"`
