@@ -1,61 +1,60 @@
 package controllers
 import (
-	"fmt"
 	"net/http"
 	"github.com/gin-gonic/gin"
 	"github.com/yimango/beatpace-backend/services"
-
 )
 
 func Callback(c *gin.Context) {
 	// 1) Read code
 	code := c.Query("code")
 	if code == "" {
-	  c.JSON(http.StatusBadRequest, gin.H{"error":"missing code"})
+	  c.JSON(http.StatusBadRequest, gin.H{"error": "missing code"})
 	  return
 	}
   
 	// 2) Exchange for tokens
 	tok, err := services.GetSpotifyAccessToken(code)
-	
 	if err != nil {
-	  c.JSON(http.StatusBadGateway, gin.H{"error":"token exchange failed"})
+	  c.JSON(http.StatusBadGateway, gin.H{"error": "token exchange failed"})
 	  return
 	}
-	expiresAt := time.Now().Add(time.Duration(tok.ExpiresIn)*time.Second)
   
 	// 3) Fetch Spotify user ID
-	spUser, err := services.FetchSpotifyUser(tok.AccessToken)
+	fetchUserService := services.FetchUserService{AccessToken: tok.AccessToken}
+	spotifyID, err := fetchUserService.FetchUserID()
 	if err != nil {
-	  c.JSON(http.StatusBadGateway, gin.H{"error":"failed to fetch profile"})
+	  c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch user ID"})
 	  return
 	}
   
-	// 4) Find or create your user
-	internalUserID, err := services.FindOrCreateUser(spUser.ID)
+	// 4) Save tokens + spotifyID in your DB
+	/* if err := services.SaveSpotifyTokens(spotifyID, tok); err != nil {
+	  c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to save tokens"})
+	  return
+	} */
+  
+	// 5) Mint your JWT
+	jwtToken, err := services.GenerateJWTToken(spotifyID)
 	if err != nil {
-	  c.JSON(http.StatusInternalServerError, gin.H{"error":"db error"})
+	  c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to generate JWT"})
 	  return
 	}
   
-	// 5) Save tokens
-	if err := services.SaveSpotifyTokens(internalUserID,
-		 tok.AccessToken, tok.RefreshToken, expiresAt); err != nil {
-	  c.JSON(http.StatusInternalServerError, gin.H{"error":"failed to save tokens"})
-	  return
-	}
+	// 6) Set it as an HttpOnly cookie
+	c.SetCookie(
+	  "app_jwt",
+	  jwtToken,
+	  3600*24,      // 1 day
+	  "/",          // available to all paths
+	  "",           // your domain (empty = current host)
+	  true,         // secure
+	  true,         // httpOnly
+	)
   
-	// 6) Mint JWT
-	jwtStr, err := services.GenerateJWTToken(internalUserID)
-	if err != nil {
-	  c.JSON(http.StatusInternalServerError, gin.H{"error":"failed to generate JWT"})
-	  return
-	}
-  
-	// 7) Set HttpOnly cookie
-	c.SetCookie("app_jwt", jwtStr, 3600*24, "/", "", true, true)
-  
-	// 8) Redirect to your front end
-	c.Redirect(http.StatusSeeOther, "http://localhost:3000")
+	// 7) Redirect the browser back to your React app
+	c.Redirect(http.StatusSeeOther, "http://localhost:3000/")
+	// note: no c.JSON() after this
   }
+  
   

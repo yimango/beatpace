@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gin-contrib/cors"
 	"github.com/yimango/beatpace-backend/controllers"
+	"github.com/yimango/beatpace-backend/middleware"
 )
 
 func main() {
@@ -22,7 +23,12 @@ func main() {
 
 	// Set up your routes
 	//router.POST("/api/generate-playlist", controllers.GeneratePlaylist)
-	router.POST("/api/callback", controllers.Callback)
+	router.GET("/api/callback", controllers.Callback)
+	api := router.Group("/api")
+  api.Use(middleware.JWT())
+  {
+    api.GET("/me", controllers.MeHandler)
+  }
 
 	// Start the server
 	fmt.Println("Server is running on http://localhost:3001")
