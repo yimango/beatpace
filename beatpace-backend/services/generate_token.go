@@ -1,28 +1,38 @@
-// generate JWT Token
 package services
-import (
-	"fmt"
-	"time"
-	"github.com/golang-jwt/jwt/v5"
 
+import (
+	"encoding/base64"
+	"log"
+	"os"
+	"time"
+
+	"github.com/golang-jwt/jwt/v5"
 )
-// GenerateJWTToken generates a JWT token for the user
-func GenerateJWTToken(userID string) (string, error) {
-	// Define the token expiration time
-	expirationTime := time.Now().Add(24 * time.Hour) // Token valid for 24 hours
-	claims := &jwt.RegisteredClaims{
-		Issuer:    userID,
-		ExpiresAt: jwt.NewNumericDate(expirationTime),
-		IssuedAt:  jwt.NewNumericDate(time.Now()),
+
+// jwtSecret holds the decoded JWT signing key.
+var jwtSecret []byte
+
+func init() {
+	raw := os.Getenv("JWT_SECRET")
+	if raw == "" {
+		log.Fatal("JWT_SECRET environment variable is not set")
 	}
-	// Create the token using the claims
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	// Sign the token with a secret key
-	secretKey := []byte("your_secret_key") // Replace with your actual secret key
-	tokenString, err := token.SignedString(secretKey)
+	// The secret is stored base64-encoded in the environment, so decode it
+	decoded, err := base64.StdEncoding.DecodeString(raw)
 	if err != nil {
-		return "", fmt.Errorf("failed to sign token: %v", err)
+		log.Fatalf("failed to base64-decode JWT_SECRET: %v", err)
 	}
-	// Return the signed token string
-	return tokenString, nil
+	jwtSecret = decoded
+	log.Printf("[AUTH] JWT secret loaded, %d bytes", len(jwtSecret))
+}
+
+// GenerateJWTToken creates an HS256-signed JWT with `sub` set to the given userID.
+func GenerateJWTToken(userID string) (string, error) {
+	claims := jwt.RegisteredClaims{
+		Subject:   userID,
+		IssuedAt:  jwt.NewNumericDate(time.Now()),
+		ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString(jwtSecret)
 }

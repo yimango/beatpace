@@ -1,36 +1,39 @@
+// main.go
 package main
 
 import (
-	"fmt"
-	"log"
-	"github.com/gin-gonic/gin"
-	"github.com/gin-contrib/cors"
-	"github.com/yimango/beatpace-backend/controllers"
-	"github.com/yimango/beatpace-backend/middleware"
+    "log"
+    "time"
+
+    "github.com/gin-contrib/cors"
+    "github.com/gin-gonic/gin"
+    "github.com/yimango/beatpace-backend/controllers"
+    "github.com/yimango/beatpace-backend/middleware"
 )
 
 func main() {
-	// Create a Gin router
-	router := gin.Default()
+    router := gin.Default()
 
-	// Define CORS middleware for Gin
-	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:3000"}, // Change this to your frontend's origin
-		AllowMethods:     []string{"POST"},
-		AllowHeaders:     []string{"Content-Type"},
-		AllowCredentials: true,
-	}))
+    // 1) CORS must allow credentials from your frontend
+    router.Use(cors.New(cors.Config{
+        AllowOrigins:     []string{"http://localhost:3000"},
+        AllowMethods:     []string{"GET", "POST"},
+        AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
+        AllowCredentials: true,
+        MaxAge:           12 * time.Hour,
+    }))
 
-	// Set up your routes
-	//router.POST("/api/generate-playlist", controllers.GeneratePlaylist)
-	router.GET("/api/callback", controllers.Callback)
-	api := router.Group("/api")
-  api.Use(middleware.JWT())
-  {
-    api.GET("/me", controllers.MeHandler)
-  }
+    // 2) OAuth callback (no auth)
+    router.GET("/api/callback", controllers.Callback)
 
-	// Start the server
-	fmt.Println("Server is running on http://localhost:3001")
-	log.Fatal(router.Run(":3001"))
+    // 3) Protected routes
+    api := router.Group("/api")
+    api.Use(middleware.JWT())
+    {
+        api.GET("/me", controllers.MeHandler)
+        // ... other routes ...
+    }
+
+    log.Println("Server running on http://localhost:3001")
+    router.Run(":3001")
 }
