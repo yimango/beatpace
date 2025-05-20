@@ -7,7 +7,6 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 
 	"github.com/yimango/beatpace-backend/controllers"
 	"github.com/yimango/beatpace-backend/db"
@@ -17,9 +16,21 @@ import (
 )
 
 func main() {
-	// Load environment variables
-	if err := godotenv.Load(); err != nil {
-		log.Printf("Warning: Error loading .env file: %v", err)
+	// Debug: Print all environment variables (excluding sensitive ones)
+	log.Printf("Environment variables loaded:")
+	log.Printf("JWT_SECRET exists: %v", os.Getenv("JWT_SECRET") != "")
+	log.Printf("CLIENT_ID exists: %v", os.Getenv("CLIENT_ID") != "")
+	log.Printf("CLIENT_SECRET exists: %v", os.Getenv("CLIENT_SECRET") != "")
+	log.Printf("REDIRECT_URI exists: %v", os.Getenv("REDIRECT_URI") != "")
+
+	// Verify required environment variables
+	requiredEnvVars := []string{"JWT_SECRET", "CLIENT_ID", "CLIENT_SECRET", "REDIRECT_URI"}
+	for _, envVar := range requiredEnvVars {
+		value := os.Getenv(envVar)
+		if value == "" {
+			log.Fatalf("Required environment variable %s is not set", envVar)
+		}
+		log.Printf("Found %s: %s", envVar, value[:min(5, len(value))]+"...")
 	}
 
 	// 1) initialize the DB connection and run migrations
@@ -80,4 +91,11 @@ func main() {
 	// 8) start the server
 	log.Println("Server running on http://localhost:3001")
 	router.Run(":3001")
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
 }

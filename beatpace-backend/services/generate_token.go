@@ -6,6 +6,8 @@ import (
 	"os"
 	"time"
 
+	_ "github.com/yimango/beatpace-backend/envloader"
+
 	"github.com/golang-jwt/jwt/v5"
 )
 
