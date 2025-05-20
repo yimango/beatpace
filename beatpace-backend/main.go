@@ -16,6 +16,9 @@ import (
 )
 
 func main() {
+	// Set Gin to release mode
+	gin.SetMode(gin.ReleaseMode)
+
 	// Debug: Print all environment variables (excluding sensitive ones)
 	log.Printf("Environment variables loaded:")
 	log.Printf("JWT_SECRET exists: %v", os.Getenv("JWT_SECRET") != "")
@@ -58,6 +61,9 @@ func main() {
 
 	// 5) create the Gin router
 	router := gin.Default()
+
+	// Configure trusted proxies
+	router.SetTrustedProxies([]string{"127.0.0.1"})
 
 	// 6) configure CORS
 	router.Use(cors.New(cors.Config{
