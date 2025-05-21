@@ -88,6 +88,8 @@ npm run dev
 4. **View Your Playlist**
    - Playlist is saved to your Spotify account and linked in the UI.
   
+
+  ![BeatPace UI](assets/beatpace_input.png)
 ---
 
 ## Architecture Overview
